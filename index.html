@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Batu Gunting Kertas</title>
+  </head>
+  <body>
+    <h1>Game Batu Gunting Kertas</h1>
+
+    <button class="js-batu-button">Batu</button>
+
+    <button class="js-gunting-button">Gunting</button>
+
+    <button class="js-kertas-button">Kertas</button>
+
+    <p class="js-result"></p>
+
+    <p class="js-move"></p>
+
+    <p class="js-score"></p>
+
+    <button class="js-reset-button">Reset Score</button>
+
+    <button class="js-auto-play-button">Bermain Otomatis</button>
+
+    <script>
+      console.log("Bismillah \nFery Gunawan, September 2025");
+
+      let score = JSON.parse(localStorage.getItem('scoreSave')) || {
+        menang: 0,
+        kalah: 0,
+        seimbang: 0,
+      };
+
+      function pickComputerMove() {
+        const randomNumber = Math.random();
+        //console.log(randomNumber);
+
+        let computerMove;
+        if (randomNumber >= 0 && randomNumber < 1 / 3) {
+          computerMove = "batu";
+        } else if (randomNumber >= 1 / 3 && randomNumber < 2 / 3) {
+          computerMove = "gunting";
+        } else if (randomNumber >= 2 / 3) {
+          computerMove = "kertas";
+        }
+        //console.log(computerMove);
+
+        return computerMove;
+      }
+
+      function playGame(playerMove) {
+        const computerMove = pickComputerMove();
+        let result;
+
+        if (playerMove === "batu") {
+          if (computerMove === "batu") {
+            result = "Seimbang";
+          } else if (computerMove === "gunting") {
+            result = "Kamu menang";
+          } else if (computerMove === "kertas") {
+            result = "Kamu kalah";
+          }
+        } else if (playerMove === "gunting") {
+          if (computerMove === "batu") {
+            result = "Kamu kalah";
+          } else if (computerMove === "gunting") {
+            result = "Seimbang";
+          } else if (computerMove === "kertas") {
+            result = "Kamu menang";
+          }
+        } else if (playerMove === "kertas") {
+          if (computerMove === "batu") {
+            result = "Kamu menang";
+          } else if (computerMove === "gunting") {
+            result = "Kamu kalah";
+          } else if (computerMove === "kertas") {
+            result = "Seimbang";
+          }
+        }
+
+        if (result === "Kamu menang") {
+          score.menang++;
+        } else if (result === "Kamu kalah") {
+          score.kalah++;
+        } else if (result === "Seimbang") {
+          score.seimbang++;
+        }
+
+        console.log(`Kamu ${playerMove} \nKomputer ${computerMove} \n${result}`);
+
+        //render hasil
+        document.querySelector(".js-result").innerHTML = result;
+
+        document.querySelector(".js-move").innerHTML = `Kamu => ${playerMove} vs ${computerMove} <= Komputer`;
+
+        document.querySelector('.js-score').innerHTML = `Menang: ${score.menang}, Kalah: ${score.kalah}, Seimbang: ${score.seimbang}.`;
+
+        //simpan score
+        localStorage.setItem('scoreSave', JSON.stringify(score));
+      }
+
+      //Pilih 
+      document.querySelector('.js-batu-button').addEventListener('click', () => {
+        playGame('batu');
+      });
+
+      document.querySelector('.js-gunting-button').addEventListener('click', () => {
+        playGame('gunting');
+      });
+
+      document.querySelector('.js-kertas-button').addEventListener('click', () => {
+        playGame('kertas');
+      });
+
+      document.body.addEventListener('keydown', (event) => {
+        if (event.key === 'b' || event.key === '1') {
+          playGame('batu');
+        } else if (event.key === 'g' || event.key === '2') {
+          playGame('gunting');
+        } else if (event.key === 'k' || event.key === '3') {
+          playGame('kertas');
+        }
+      });
+
+      //reset score
+      document.querySelector('.js-reset-button').addEventListener('click', () => {
+        localStorage.removeItem('scoreSave');
+
+        score = {
+          menang: 0,
+          kalah: 0,
+          seimbang: 0,
+        }
+
+        //render
+        document.querySelector(".js-result").innerHTML = '';
+
+        document.querySelector(".js-move").innerHTML = `Score di-reset!`;
+
+        document.querySelector('.js-score').innerHTML = `Menang: ${score.menang}, Kalah: ${score.kalah}, Seimbang: ${score.seimbang}.`;
+      });
+
+      //Bermain otomatis
+      let isAutoPlaying = false;
+      let intervalId;
+
+      document.querySelector('.js-auto-play-button').addEventListener('click', () => {
+        if (!isAutoPlaying) {
+          intervalId = setInterval(() => {
+            const playerMove = pickComputerMove();
+
+            playGame(playerMove);
+          }, 1000);
+
+          isAutoPlaying = true;
+
+          setTimeout(() => {
+            document.querySelector('.js-auto-play-button').innerHTML = 'Berhenti Bermain Otomatis';
+          }, 1000);
+        } else {
+          clearInterval(intervalId);
+          isAutoPlaying = false;
+
+          document.querySelector('.js-auto-play-button').innerHTML = 'Bermain Otomatis';
+        }
+      });
+    </script>
+  </body>
+</html>
